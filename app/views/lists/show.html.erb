@@ -5,19 +5,50 @@
 <h4><%= @list.description %></h4>
 
 <% if @list.tasks.any? %>
-  <h4>Here are the tasks for this list:</h4>
+  <% if @list.tasks.not_done.any? %>
+  <h4>Tasks not done:</h4>
 
   <ul>
-    <% @list.tasks.each do |task| %>
+    <% @list.tasks.not_done.each do |task| %>
       <li>
         <%= task.description %> |
+
+        <%= form_for [@list, task] do |f| %>
+        <%= f.hidden_field :done, :value => true %>
+        <%= f.submit "Done", :class => 'btn btn-xs btn-success' %>
+        <% end %> |
+
         <%= link_to "Edit", edit_list_task_path(@list, task) %> |
         <%= link_to "Delete", list_task_path(@list, task),
         :data => {:confirm => "Are you sure, bro?",
           :method => "delete"} %>
-        </li>
-      <% end %>
-  </ul>
+      </li>
+    <% end %>
+    </ul>
+  <% end %>
+
+  <% if @list.tasks.done.any? %>
+    <h4>Here are the finished tasks for this list:</h4>
+
+    <ul>
+      <% @list.tasks.done.each do |task| %>
+        <li>
+          <%= task.description %> |
+
+          <%= form_for [@list, task] do |f| %>
+          <%= f.hidden_field :done, :value => false %>
+          <%= f.submit "Not Done", :class => 'btn btn-xs btn-warning' %>
+          <% end %> |
+
+          <%= link_to "Edit", edit_list_task_path(@list, task) %> |
+          <%= link_to "Delete", list_task_path(@list, task),
+          :data => {:confirm => "Are you sure, bro?",
+            :method => "delete"} %>
+          </li>
+        <% end %>
+    </ul>
+  <% end %>
+
 <% else %>
   <p>There are no tasks yet!</p>
 <% end %>
